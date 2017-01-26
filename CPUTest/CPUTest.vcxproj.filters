@@ -42,6 +42,9 @@
     <ClCompile Include="instructions\arithmetic.cpp">
       <Filter>Source Files\instructions</Filter>
     </ClCompile>
+    <ClCompile Include="instructions\transfer.cpp">
+      <Filter>Source Files\instructions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpu.h">

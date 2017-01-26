@@ -126,6 +126,7 @@
     <ClCompile Include="instructions\clear_set.cpp" />
     <ClCompile Include="instructions\inc_dec.cpp" />
     <ClCompile Include="instructions\logical.cpp" />
+    <ClCompile Include="instructions\transfer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="opcode.cpp" />
     <ClCompile Include="registers.cpp" />

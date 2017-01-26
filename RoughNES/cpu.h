@@ -291,7 +291,7 @@ void CPU::SBC(const OpcodeInfo& info)
   auto acc = m_reg.a;
   uint8_t carry = m_reg.get_flag(Status::Carry);
 
-  m_reg.a -= value - (1 - carry);
+  m_reg.a = acc - value - (1 - carry);
 
   m_reg.set_flag(Status::Carry, acc - value - (1 - carry) >= 0);
   m_reg.set_zn(m_reg.a);
