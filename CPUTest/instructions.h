@@ -4,7 +4,7 @@
 
 namespace InstructionTests
 {
-  struct InstructionTest : public CPUTests::CPUTest
+  struct InstructionTest : CPUTests::CPUTest
   {
     
   };

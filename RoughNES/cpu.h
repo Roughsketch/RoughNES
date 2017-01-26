@@ -2,14 +2,17 @@
 
 #include <cstdint>
 #include <vector>
+#include <stack>
 
 #include "register.h"
 #include "opcode.h"
 
 class CPU
 {
+  const uint16_t IRQVectorAddress = 0xFFFE;
+  const uint16_t StackStart = 0x100;
+
   std::vector<uint8_t> m_rom;
-  std::vector<uint8_t> m_ppumem;
   std::vector<uint8_t> m_sysmem;
   Registers m_reg;
   uint64_t m_cycles;
@@ -46,9 +49,14 @@ public:
   inline void set_reg_a(uint8_t value);
   inline void set_reg_x(uint8_t value);
   inline void set_reg_y(uint8_t value);
+  inline void set_reg_s(uint8_t value);
+
+  inline void stack_push_byte(uint8_t value);
+  inline uint8_t stack_pull_byte();
+  inline void stack_push_word(uint16_t value);
+  inline uint16_t stack_pull_word();
 
 #pragma region Set and Clear status flags
-  //  Set and Clear status flags
   inline void SEC(const OpcodeInfo& info);
   inline void SED(const OpcodeInfo& info);
   inline void SEI(const OpcodeInfo& info);
@@ -176,6 +184,35 @@ void CPU::set_reg_y(uint8_t value)
   m_reg.y = value;
 }
 
+void CPU::set_reg_s(uint8_t value)
+{
+  m_reg.s = value;
+}
+
+void CPU::stack_push_byte(uint8_t value)
+{
+  write_byte(value, StackStart | m_reg.s);
+  --m_reg.s;
+}
+
+uint8_t CPU::stack_pull_byte()
+{
+  ++m_reg.s;
+  return read_byte(StackStart | m_reg.s);
+}
+
+void CPU::stack_push_word(uint16_t value)
+{
+  write_word(value, StackStart | m_reg.s);
+  --m_reg.s;
+}
+
+uint16_t CPU::stack_pull_word()
+{
+  ++m_reg.s;
+  return read_word(StackStart | m_reg.s);
+}
+
 void CPU::SEC(const OpcodeInfo& info)
 {
   m_reg.set_flag(Status::Carry, true);
@@ -300,30 +337,102 @@ void CPU::SBC(const OpcodeInfo& info)
 
 void CPU::LSR(const OpcodeInfo& info)
 {
+  uint8_t temp;
+
+  if (info.mode == Instruction::AddressMode::Accumulator)
+  {
+    temp = m_reg.a;
+    m_reg.a = (temp / 2) | (m_reg.get_flag(Status::Carry) << 7);
+    m_reg.set_flag(Status::Carry, (temp & 1) > 0);
+    m_reg.set_zn(m_reg.a);
+  }
+  else
+  {
+    temp = read_byte(info.address);
+    int8_t result = (temp / 2) | (m_reg.get_flag(Status::Carry) << 7);
+    m_reg.set_flag(Status::Carry, (temp & 1) > 0);
+    m_reg.set_zn(result);
+    write_byte(result, info.address);
+  }
 }
 
 void CPU::ASL(const OpcodeInfo& info)
 {
+  if (info.mode == Instruction::AddressMode::Accumulator)
+  {
+    uint8_t temp = m_reg.a;
+    m_reg.a = (temp * 2) | static_cast<int>(m_reg.get_flag(Status::Carry));;
+    m_reg.set_flag(Status::Carry, (temp & 0x80) > 0);
+    m_reg.set_zn(m_reg.a);
+  }
+  else
+  {
+    auto temp = read_byte(info.address);
+    int8_t result = (temp * 2) | static_cast<int>(m_reg.get_flag(Status::Carry));
+    m_reg.set_flag(Status::Carry, (temp & 0x80) > 0);
+    m_reg.set_zn(result);
+    write_byte(result, info.address);
+  }
 }
 
 void CPU::ROR(const OpcodeInfo& info)
 {
+  if (info.mode == Instruction::AddressMode::Accumulator)
+  {
+    auto bit_zero = (m_reg.a & 1) > 0;
+    m_reg.a = (m_reg.a >> 1) | (m_reg.get_flag(Status::Carry) << 7);
+    m_reg.set_flag(Status::Carry, bit_zero);
+    m_reg.set_zn(m_reg.a);
+  }
+  else
+  {
+    int8_t value = read_byte(info.address);
+    auto bit_zero = (value & 1) > 0;
+    value = (value >> 1) | (m_reg.get_flag(Status::Carry) << 7);
+    m_reg.set_flag(Status::Carry, bit_zero);
+    m_reg.set_zn(value);
+    write_byte(value, info.address);
+  }
 }
 
 void CPU::ROL(const OpcodeInfo& info)
 {
+  if (info.mode == Instruction::AddressMode::Accumulator)
+  {
+    auto last_bit = (m_reg.a & 0x80) > 0;
+    m_reg.a = (m_reg.a << 1) | static_cast<int>(m_reg.get_flag(Status::Carry));
+    m_reg.set_flag(Status::Carry, last_bit);
+    m_reg.set_zn(m_reg.a);
+  }
+  else
+  {
+    int8_t value = read_byte(info.address);
+    auto last_bit = (value & 0x80) > 0;
+    value = (value << 1) | static_cast<int>(m_reg.get_flag(Status::Carry));
+    m_reg.set_flag(Status::Carry, last_bit);
+    m_reg.set_zn(value);
+    write_byte(value, info.address);
+  }
 }
 
 void CPU::BRK(const OpcodeInfo& info)
 {
+  stack_push_word(m_reg.pc);
+  stack_push_byte(m_reg.p);
+
+  m_reg.pc = read_word(IRQVectorAddress);
+  m_reg.set_flag(Status::Break, true);
 }
 
 void CPU::NOP(const OpcodeInfo& info)
 {
+  //  Do nothing
 }
 
 void CPU::RTI(const OpcodeInfo& info)
 {
+  m_reg.p = stack_pull_byte();
+  m_reg.pc = stack_pull_word();
 }
 
 void CPU::TAX(const OpcodeInfo& info)
@@ -363,100 +472,169 @@ void CPU::TYA(const OpcodeInfo& info)
 
 void CPU::BCC(const OpcodeInfo& info)
 {
+  if (!m_reg.get_flag(Status::Carry))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BCS(const OpcodeInfo& info)
 {
+  if (m_reg.get_flag(Status::Carry))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BEQ(const OpcodeInfo& info)
 {
+  if (m_reg.get_flag(Status::Zero))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BMI(const OpcodeInfo& info)
 {
+  if (m_reg.get_flag(Status::Negative))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BNE(const OpcodeInfo& info)
 {
+  if (!m_reg.get_flag(Status::Zero))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BPL(const OpcodeInfo& info)
 {
+  if (!m_reg.get_flag(Status::Negative))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BVC(const OpcodeInfo& info)
 {
+  if (!m_reg.get_flag(Status::Overflow))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::BVS(const OpcodeInfo& info)
 {
+  if (m_reg.get_flag(Status::Overflow))
+  {
+    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+  }
 }
 
 void CPU::JMP(const OpcodeInfo& info)
 {
+  m_reg.pc = read_word(info.address);
 }
 
 void CPU::JSR(const OpcodeInfo& info)
 {
+  stack_push_word(m_reg.pc - 1);
+  m_reg.pc = info.address;
 }
 
 void CPU::RTS(const OpcodeInfo& info)
 {
+  m_reg.pc = stack_pull_word() - 1;
 }
 
 void CPU::LDA(const OpcodeInfo& info)
 {
+  m_reg.a = read_byte(info.address);
+  m_reg.set_zn(m_reg.a);
 }
 
 void CPU::LDX(const OpcodeInfo& info)
 {
+  m_reg.x = read_byte(info.address);
+  m_reg.set_zn(m_reg.x);
 }
 
 void CPU::LDY(const OpcodeInfo& info)
 {
+  m_reg.y = read_byte(info.address);
+  m_reg.set_zn(m_reg.y);
 }
 
 void CPU::STA(const OpcodeInfo& info)
 {
+  write_byte(m_reg.a, info.address);
 }
 
 void CPU::STX(const OpcodeInfo& info)
 {
+  write_byte(m_reg.x, info.address);
 }
 
 void CPU::STY(const OpcodeInfo& info)
 {
+  write_byte(m_reg.y, info.address);
 }
 
 void CPU::CMP(const OpcodeInfo& info)
 {
+  int8_t mem = read_byte(info.address);
+  int8_t value = m_reg.a - mem;
+
+  m_reg.set_flag(Status::Carry, m_reg.a >= mem);
+  m_reg.set_zn(value);
 }
 
 void CPU::CPX(const OpcodeInfo& info)
 {
+  int8_t mem = read_byte(info.address);
+  int8_t value = m_reg.x - mem;
+
+  m_reg.set_flag(Status::Carry, m_reg.x >= mem);
+  m_reg.set_zn(value);
 }
 
 void CPU::CPY(const OpcodeInfo& info)
 {
+  int8_t mem = read_byte(info.address);
+  int8_t value = m_reg.y - mem;
+
+  m_reg.set_flag(Status::Carry, m_reg.y >= mem);
+  m_reg.set_zn(value);
 }
 
 void CPU::PHA(const OpcodeInfo& info)
 {
+  stack_push_byte(m_reg.a);
 }
 
 void CPU::PHP(const OpcodeInfo& info)
 {
+  stack_push_byte(m_reg.p);
 }
 
 void CPU::PLA(const OpcodeInfo& info)
 {
+  m_reg.a = stack_pull_byte();
+  m_reg.set_zn(m_reg.a);
 }
 
 void CPU::PLP(const OpcodeInfo& info)
 {
+  m_reg.p = stack_pull_byte();
 }
 
+//
+//Illegal Opcodes Below.
+//
+#pragma region Illegal Opcodes
 void CPU::AHX(const OpcodeInfo& info)
 {
 }
@@ -532,3 +710,4 @@ void CPU::TAS(const OpcodeInfo& info)
 void CPU::XAA(const OpcodeInfo& info)
 {
 }
+#pragma endregion

@@ -37,7 +37,6 @@ void(CPU::*CPU::FuncTable[])(const OpcodeInfo&) = {
 
 CPU::CPU() : m_cycles(0)
 {
-  m_ppumem.resize(MemorySize + 1);
   m_sysmem.resize(MemorySize + 1);
 };
 
