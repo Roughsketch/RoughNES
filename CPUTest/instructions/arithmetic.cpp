@@ -304,13 +304,99 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
+  TEST_F(InstructionTest, RORCanRotateAccumulatorRight)
+  {
+    cpu->load_rom({ 0x6A });
+    cpu->set_reg_a(0xAA);
+    cpu->step();
+
+    auto regs = cpu->get_registers();
+
+    EXPECT_EQ(0x55, regs.a);
+  }
+
+  TEST_F(InstructionTest, RORCanRotateAccumulatorRightWithCarry)
+  {
+    cpu->load_rom({ 0x6A });
+
+    auto regs = cpu->get_registers();
+    regs.a = 0xAA;
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    regs = cpu->get_registers();
+
+    EXPECT_EQ(static_cast<int8_t>(0xD5), regs.a);
+  }
+
   TEST_F(InstructionTest, RORCanRotateRight)
   {
-    FAIL();
+    cpu->load_rom({ 0x66, 0x02, 0xAA });
+    cpu->step();
+
+    EXPECT_EQ(0x55, cpu->read_byte(2));
+  }
+
+  TEST_F(InstructionTest, RORCanRotateRightWithCarry)
+  {
+    cpu->load_rom({ 0x66, 0x02, 0xAA });
+
+    auto regs = cpu->get_registers();
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    EXPECT_EQ(0xD5, cpu->read_byte(2));
+  }
+
+  TEST_F(InstructionTest, ROLCanRotateAccumulatorLeft)
+  {
+    cpu->load_rom({ 0x2A });
+    cpu->set_reg_a(0x55);
+    cpu->step();
+
+    auto regs = cpu->get_registers();
+
+    EXPECT_EQ(static_cast<int8_t>(0xAA), regs.a);
+  }
+
+  TEST_F(InstructionTest, ROLCanRotateAccumulatorLeftWithCarry)
+  {
+    cpu->load_rom({ 0x2A });
+
+    auto regs = cpu->get_registers();
+    regs.a = 0x55;
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    regs = cpu->get_registers();
+
+    EXPECT_EQ(static_cast<int8_t>(0xAB), regs.a);
   }
 
   TEST_F(InstructionTest, ROLCanRotateLeft)
   {
-    FAIL();
+    cpu->load_rom({ 0x26, 0x02, 0x55 });
+    cpu->step();
+
+    EXPECT_EQ(0xAA, cpu->read_byte(2));
+  }
+
+  TEST_F(InstructionTest, ROLCanRotateLeftWithCarry)
+  {
+    cpu->load_rom({ 0x26, 0x02, 0x55 });
+
+    auto regs = cpu->get_registers();
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    EXPECT_EQ(0xAB, cpu->read_byte(2));
   }
 }

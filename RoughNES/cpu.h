@@ -380,13 +380,13 @@ void CPU::ROR(const OpcodeInfo& info)
   if (info.mode == Instruction::AddressMode::Accumulator)
   {
     auto bit_zero = (m_reg.a & 1) > 0;
-    m_reg.a = (m_reg.a >> 1) | (m_reg.get_flag(Status::Carry) << 7);
+    m_reg.a = (static_cast<uint8_t>(m_reg.a) >> 1) | (m_reg.get_flag(Status::Carry) << 7);
     m_reg.set_flag(Status::Carry, bit_zero);
     m_reg.set_zn(m_reg.a);
   }
   else
   {
-    int8_t value = read_byte(info.address);
+    auto value = read_byte(info.address);
     auto bit_zero = (value & 1) > 0;
     value = (value >> 1) | (m_reg.get_flag(Status::Carry) << 7);
     m_reg.set_flag(Status::Carry, bit_zero);
@@ -400,13 +400,13 @@ void CPU::ROL(const OpcodeInfo& info)
   if (info.mode == Instruction::AddressMode::Accumulator)
   {
     auto last_bit = (m_reg.a & 0x80) > 0;
-    m_reg.a = (m_reg.a << 1) | static_cast<int>(m_reg.get_flag(Status::Carry));
+    m_reg.a = (static_cast<uint8_t>(m_reg.a) << 1) | static_cast<int>(m_reg.get_flag(Status::Carry));
     m_reg.set_flag(Status::Carry, last_bit);
     m_reg.set_zn(m_reg.a);
   }
   else
   {
-    int8_t value = read_byte(info.address);
+    auto value = read_byte(info.address);
     auto last_bit = (value & 0x80) > 0;
     value = (value << 1) | static_cast<int>(m_reg.get_flag(Status::Carry));
     m_reg.set_flag(Status::Carry, last_bit);
