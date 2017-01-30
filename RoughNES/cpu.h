@@ -474,7 +474,7 @@ void CPU::BCC(const OpcodeInfo& info)
 {
   if (!m_reg.get_flag(Status::Carry))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -482,7 +482,7 @@ void CPU::BCS(const OpcodeInfo& info)
 {
   if (m_reg.get_flag(Status::Carry))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -490,7 +490,7 @@ void CPU::BEQ(const OpcodeInfo& info)
 {
   if (m_reg.get_flag(Status::Zero))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -498,7 +498,7 @@ void CPU::BMI(const OpcodeInfo& info)
 {
   if (m_reg.get_flag(Status::Negative))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -506,7 +506,7 @@ void CPU::BNE(const OpcodeInfo& info)
 {
   if (!m_reg.get_flag(Status::Zero))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -514,7 +514,7 @@ void CPU::BPL(const OpcodeInfo& info)
 {
   if (!m_reg.get_flag(Status::Negative))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -522,7 +522,7 @@ void CPU::BVC(const OpcodeInfo& info)
 {
   if (!m_reg.get_flag(Status::Overflow))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 
@@ -530,7 +530,7 @@ void CPU::BVS(const OpcodeInfo& info)
 {
   if (m_reg.get_flag(Status::Overflow))
   {
-    m_reg.pc += static_cast<int8_t>(read_byte(info.address));
+    m_reg.pc = info.address;
   }
 }
 

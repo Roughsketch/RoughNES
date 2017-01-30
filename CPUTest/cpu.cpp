@@ -123,14 +123,14 @@ namespace CPUTests
   {
     cpu->load_rom({ 0x00, 0x80 });
     auto address = cpu->get_address(Instruction::AddressMode::Relative);
-    EXPECT_EQ(static_cast<uint16_t>(-126), address);
+    EXPECT_EQ(static_cast<uint16_t>(-128), address);
   }
 
   TEST_F(CPUTest, CPUGetRelativeAddressPositive)
   {
     cpu->load_rom({ 0x00, 0x7F });
     auto address = cpu->get_address(Instruction::AddressMode::Relative);
-    EXPECT_EQ(129, address);
+    EXPECT_EQ(127, address);
   }
 
   TEST_F(CPUTest, CPUGetZeroPageAddress)

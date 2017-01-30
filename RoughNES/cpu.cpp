@@ -96,7 +96,7 @@ uint16_t CPU::get_address(Instruction::AddressMode mode) const
   case Instruction::AddressMode::IndirectY:
     return read_word(read_byte(m_reg.pc + 1)) + m_reg.y;
   case Instruction::AddressMode::Relative:
-    return static_cast<int8_t>(read_byte(m_reg.pc + 1)) + m_reg.pc + 2;
+    return static_cast<int8_t>(read_byte(m_reg.pc + 1)) + m_reg.pc;
   case Instruction::AddressMode::ZeroPage:
     return read_byte(m_reg.pc + 1);
   case Instruction::AddressMode::ZeroPageX:
