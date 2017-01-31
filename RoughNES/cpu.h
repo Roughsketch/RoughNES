@@ -22,6 +22,7 @@ class CPU
     uint16_t address;
     uint16_t pc;
     Instruction::AddressMode mode;
+    uint8_t size;
   };
 
   static void(CPU::*FuncTable[])(const OpcodeInfo&);
@@ -536,7 +537,7 @@ void CPU::BVS(const OpcodeInfo& info)
 
 void CPU::JMP(const OpcodeInfo& info)
 {
-  m_reg.pc = read_word(info.address);
+  m_reg.pc = read_word(info.address) - info.size;
 }
 
 void CPU::JSR(const OpcodeInfo& info)

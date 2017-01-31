@@ -60,7 +60,7 @@ void CPU::step()
   auto opcode = read_byte(m_reg.pc);
   auto info = Instruction::Table[opcode];
   auto address = get_address(info.mode);
-  OpcodeInfo opinfo = { address, m_reg.pc, info.mode };
+  OpcodeInfo opinfo = { address, m_reg.pc, info.mode, info.size };
 
   (this->*FuncTable[opcode])(opinfo);
 
