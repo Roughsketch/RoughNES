@@ -51,6 +51,15 @@
     <ClCompile Include="instructions\branch.cpp">
       <Filter>Source Files\instructions</Filter>
     </ClCompile>
+    <ClCompile Include="instructions\compare.cpp">
+      <Filter>Source Files\instructions</Filter>
+    </ClCompile>
+    <ClCompile Include="instructions\stack.cpp">
+      <Filter>Source Files\instructions</Filter>
+    </ClCompile>
+    <ClCompile Include="instructions\system.cpp">
+      <Filter>Source Files\instructions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpu.h">

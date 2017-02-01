@@ -2,7 +2,9 @@
 
 namespace InstructionTests
 {
-  TEST_F(InstructionTest, BCCBranchesOnCarryClear)
+  struct BranchTest : InstructionTest { };
+
+  TEST_F(BranchTest, BCCBranchesOnCarryClear)
   {
     cpu->load_rom({ 0x90, 0x40 });
     cpu->step();
@@ -10,12 +12,22 @@ namespace InstructionTests
     EXPECT_EQ(0x42, cpu->get_registers().pc);
   }
 
-  TEST_F(InstructionTest, BCCDoesNothingOnCarrySet)
+  TEST_F(BranchTest, BCCDoesNothingOnCarrySet)
   {
+    cpu->load_rom({ 0x90, 0x40 });
 
+    auto regs = cpu->get_registers();
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    regs = cpu->get_registers();
+
+    EXPECT_EQ(2, regs.pc);
   }
 
-  TEST_F(InstructionTest, BCCCanBranchNegative)
+  TEST_F(BranchTest, BCCCanBranchNegative)
   {
     cpu->load_rom({ 0x90, 0xFE });
     cpu->step();
@@ -23,122 +35,247 @@ namespace InstructionTests
     EXPECT_EQ(0, cpu->get_registers().pc);
   }
 
-  TEST_F(InstructionTest, BCSBranchesOnCarrySet)
+  TEST_F(BranchTest, BCSBranchesOnCarrySet)
+  {
+    cpu->load_rom({ 0xB0, 0x40 });
+
+    auto regs = cpu->get_registers();
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    regs = cpu->get_registers();
+
+    EXPECT_EQ(0x42, regs.pc);
+  }
+
+  TEST_F(BranchTest, BCSDoesNothingOnCarryClear)
+  {
+    cpu->load_rom({ 0xB0, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(2, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BCSCanBranchNegative)
+  {
+    cpu->load_rom({ 0xB0, 0xFE });
+
+    auto regs = cpu->get_registers();
+    regs.set_flag(Status::Carry, true);
+    cpu->set_registers(regs);
+
+    cpu->step();
+
+    regs = cpu->get_registers();
+
+    EXPECT_EQ(0, regs.pc);
+  }
+
+  TEST_F(BranchTest, BEQBranchesOnZeroSet)
+  {
+    cpu->load_rom({ 0xA9, 0x40,     //  LDA #$40
+                    0xC9, 0x40,     //  CMP #$40
+                    0xF0, 0x40 });  //  BEQ $40
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(0x46, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BEQDoesNothingOnZeroClear)
+  {
+    cpu->load_rom({ 0xF0, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(2, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BEQCanBranchNegative)
+  {
+    cpu->load_rom({ 0xA9, 0x40,     //  LDA #$40
+                    0xC9, 0x40,     //  CMP #$40
+                    0xF0, 0xFA });  //  BEQ $FA (-6)
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(0, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BMIBranchesOnNegativeSet)
+  {
+    cpu->load_rom({ 0xA9, 0x40,     //  LDA #$40
+                    0xC9, 0x41,     //  CMP #$41 ; Set negative flag
+                    0x30, 0x40 });  //  BMI $40
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(0x46, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BMIDoesNothingOnNegativeClear)
+  {
+    cpu->load_rom({ 0x30, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(2, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BMICanBranchNegative)
+  {
+    cpu->load_rom({ 0xA9, 0x40,     //  LDA #$40
+                    0xC9, 0x41,     //  CMP #$41
+                    0x30, 0xFA });  //  BEQ $FA (-6)
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(0, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BNEBranchesOnZeroClear)
+  {
+    cpu->load_rom({ 0xD0, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(0x42, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BNEDoesNothingOnZeroSet)
+  {
+    cpu->load_rom({ 0xA9, 0x40,     //  LDA #$40
+                    0xC9, 0x40,     //  CMP #$40
+                    0xD0, 0x40 });  //  BNE $40
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(6, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BNECanBranchNegative)
+  {
+    cpu->load_rom({ 0xD0, 0xFE });
+    cpu->step();
+
+    EXPECT_EQ(0, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BPLBranchesOnNegativeClear)
+  {
+    cpu->load_rom({ 0x10, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(0x42, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BPLDoesNothingOnNegativeSet)
+  {
+    cpu->load_rom({ 0xA9, 0x40,     //  LDA #$40
+                    0xC9, 0x41,     //  CMP #$41
+                    0x10, 0x40 });  //  BPL $40
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(6, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BPLCanBranchNegative)
+  {
+    cpu->load_rom({ 0x10, 0xFE });
+    cpu->step();
+
+    EXPECT_EQ(0, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BVCBranchesOnOverflowClear)
+  {
+    cpu->load_rom({ 0x50, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(0x42, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BVCDoesNothingOnOverflowSet)
+  {
+    cpu->load_rom({ 0xA9, 0x70,     //  LDA #$70
+                    0x69, 0x70,     //  ADC #$70  ; Set overflow
+                    0x50, 0x40 });  //  BVC $40
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(6, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BVCCanBranchNegative)
+  {
+    cpu->load_rom({ 0x50, 0xFE });
+    cpu->step();
+
+    EXPECT_EQ(0, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BVSBranchesOnOverflowSet)
+  {
+    cpu->load_rom({ 0xA9, 0x70,     //  LDA #$70
+                    0x69, 0x70,     //  ADC #$70  ; Set overflow
+                    0x70, 0x40 });  //  BVS $40
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(0x46, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BVSDoesNothingOnOverflowClear)
+  {
+    cpu->load_rom({ 0x70, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(2, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, BVSCanBranchNegative)
+  {
+    cpu->load_rom({ 0xA9, 0x70,     //  LDA #$70
+                    0x69, 0x70,     //  ADC #$70  ; Set overflow
+                    0x70, 0xFA });  //  BVS $FA (-6)
+
+    cpu->step();
+    cpu->step();
+    cpu->step();
+
+    EXPECT_EQ(0, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, JMPCanSetAddress)
+  {
+    cpu->load_rom({ 0x4C, 0x03, 0x00, 0x00, 0x40 });
+    cpu->step();
+
+    EXPECT_EQ(0x4000, cpu->get_registers().pc);
+  }
+
+  TEST_F(BranchTest, JSRCanSetAddress)
   {
 
   }
 
-  TEST_F(InstructionTest, BCSDoesNothingOnCarryClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BCSCanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BEQBranchesOnZeroSet)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BEQDoesNothingOnZeroClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BEQCanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BMIBranchesOnNegativeSet)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BMIDoesNothingOnNegativeClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BMICanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BNEBranchesOnZeroClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BNEDoesNothingOnZeroSet)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BNECanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BPLBranchesOnNegativeClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BPLDoesNothingOnNegativeSet)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BPLCanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BVCBranchesOnOverflowClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BVCDoesNothingOnOverflowSet)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BVCCanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BVSBranchesOnOverflowSet)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BVSDoesNothingOnOverflowClear)
-  {
-
-  }
-
-  TEST_F(InstructionTest, BVSCanBranchNegative)
-  {
-
-  }
-
-  TEST_F(InstructionTest, JMPCanSetAddress)
-  {
-
-  }
-
-  TEST_F(InstructionTest, JSRCanSetAddress)
-  {
-
-  }
-
-  TEST_F(InstructionTest, RTSCanSetAddress)
+  TEST_F(BranchTest, RTSCanSetAddress)
   {
 
   }

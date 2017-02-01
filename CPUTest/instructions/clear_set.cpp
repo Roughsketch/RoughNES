@@ -1,10 +1,10 @@
-#pragma once
-
 #include "instructions.h"
 
 namespace InstructionTests
 {
-  TEST_F(InstructionTest, CLCCanClearCarry)
+  struct ClearSetTest : InstructionTest { };
+
+  TEST_F(ClearSetTest, CLCCanClearCarry)
   {
     cpu->load_rom({ 0x18 });
 
@@ -19,7 +19,7 @@ namespace InstructionTests
     EXPECT_EQ(false, regs.get_flag(Status::Carry));
   }
 
-  TEST_F(InstructionTest, SECCanSetCarry)
+  TEST_F(ClearSetTest, SECCanSetCarry)
   {
     cpu->load_rom({ 0x38 });
     cpu->step();
@@ -29,7 +29,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Carry));
   }
 
-  TEST_F(InstructionTest, CLDCanClearDecimal)
+  TEST_F(ClearSetTest, CLDCanClearDecimal)
   {
     cpu->load_rom({ 0xD8 });
 
@@ -44,7 +44,7 @@ namespace InstructionTests
     EXPECT_EQ(false, regs.get_flag(Status::Decimal));
   }
 
-  TEST_F(InstructionTest, SEDCanSetDecimal)
+  TEST_F(ClearSetTest, SEDCanSetDecimal)
   {
     cpu->load_rom({ 0xF8 });
     cpu->step();
@@ -54,7 +54,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Decimal));
   }
 
-  TEST_F(InstructionTest, CLICanClearInterrupt)
+  TEST_F(ClearSetTest, CLICanClearInterrupt)
   {
     cpu->load_rom({ 0x58 });
 
@@ -69,7 +69,7 @@ namespace InstructionTests
     EXPECT_EQ(false, regs.get_flag(Status::Interrupt));
   }
 
-  TEST_F(InstructionTest, SEICanSetInterrupt)
+  TEST_F(ClearSetTest, SEICanSetInterrupt)
   {
     cpu->load_rom({ 0x78 });
     cpu->step();
@@ -79,7 +79,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Interrupt));
   }
 
-  TEST_F(InstructionTest, CLVCanClearOverflow)
+  TEST_F(ClearSetTest, CLVCanClearOverflow)
   {
     cpu->load_rom({ 0xB8 });
 

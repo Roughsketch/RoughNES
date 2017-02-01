@@ -4,15 +4,17 @@
 
 namespace InstructionTests
 {
+  struct IncDecTest : InstructionTest { };
+
 #pragma region INC Zero Page
-  TEST_F(InstructionTest, INCZeroPageIsTwoBytes)
+  TEST_F(IncDecTest, INCZeroPageIsTwoBytes)
   {
     cpu->load_rom({ 0xE6, 0x01 });
     cpu->step();
     EXPECT_EQ(2, cpu->get_registers().pc);
   }
 
-  TEST_F(InstructionTest, INCZeroPage)
+  TEST_F(IncDecTest, INCZeroPage)
   {
     cpu->load_rom({ 0xE6, 0x01 });
     cpu->step();
@@ -20,7 +22,7 @@ namespace InstructionTests
     EXPECT_EQ(2, cpu->read_byte(1));
   }
 
-  TEST_F(InstructionTest, INCZeroPageCanSetZeroFlag)
+  TEST_F(IncDecTest, INCZeroPageCanSetZeroFlag)
   {
     cpu->load_rom({ 0xE6, 0x02, 0xFF });
     cpu->step();
@@ -29,7 +31,7 @@ namespace InstructionTests
     EXPECT_EQ(true, cpu->get_registers().get_flag(Status::Zero));
   }
 
-  TEST_F(InstructionTest, INCZeroPageCanSetNegativeFlag)
+  TEST_F(IncDecTest, INCZeroPageCanSetNegativeFlag)
   {
     cpu->load_rom({ 0xE6, 0x02, 0x7F });
     cpu->step();
@@ -40,14 +42,14 @@ namespace InstructionTests
 #pragma endregion
 
 #pragma region INC Zero Page X
-  TEST_F(InstructionTest, INCZeroPageXIsTwoBytes)
+  TEST_F(IncDecTest, INCZeroPageXIsTwoBytes)
   {
     cpu->load_rom({ 0xF6, 0x01, 0x00 });
     cpu->step();
     EXPECT_EQ(2, cpu->get_registers().pc);
   }
 
-  TEST_F(InstructionTest, INCZeroPageX)
+  TEST_F(IncDecTest, INCZeroPageX)
   {
     cpu->load_rom({ 0xF6, 0x01, 0x00 });
 
@@ -60,7 +62,7 @@ namespace InstructionTests
     EXPECT_EQ(1, cpu->read_byte(2));
   }
 
-  TEST_F(InstructionTest, INCZeroPageXCanSetZeroFlag)
+  TEST_F(IncDecTest, INCZeroPageXCanSetZeroFlag)
   {
     cpu->load_rom({ 0xF6, 0x01, 0xFF });
 
@@ -74,7 +76,7 @@ namespace InstructionTests
     EXPECT_EQ(true, cpu->get_registers().get_flag(Status::Zero));
   }
 
-  TEST_F(InstructionTest, INCZeroPageXCanSetNegativeFlag)
+  TEST_F(IncDecTest, INCZeroPageXCanSetNegativeFlag)
   {
     cpu->load_rom({ 0xF6, 0x01, 0x7F });
 
@@ -88,7 +90,7 @@ namespace InstructionTests
     EXPECT_EQ(true, cpu->get_registers().get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, INCZeroPageXClamps)
+  TEST_F(IncDecTest, INCZeroPageXClamps)
   {
     cpu->load_rom({ 0xF6, 0x00, 0xFF });
 
@@ -103,21 +105,21 @@ namespace InstructionTests
 #pragma endregion
 
 #pragma region INC Absolute
-  TEST_F(InstructionTest, INCAbsoluteIsThreeBytes)
+  TEST_F(IncDecTest, INCAbsoluteIsThreeBytes)
   {
     cpu->load_rom({ 0xEE, 0x00, 0x01 });
     cpu->step();
     EXPECT_EQ(3, cpu->get_registers().pc);
   }
 
-  TEST_F(InstructionTest, INCAbsolute)
+  TEST_F(IncDecTest, INCAbsolute)
   {
     cpu->load_rom({ 0xEE, 0x00, 0x01 });
     cpu->step();
     EXPECT_EQ(1, cpu->read_byte(0x0100));
   }
 
-  TEST_F(InstructionTest, INCAbsoluteCanSetZeroFlag)
+  TEST_F(IncDecTest, INCAbsoluteCanSetZeroFlag)
   {
     cpu->load_rom({ 0xEE, 0x03, 0x00, 0xFF });
 
@@ -127,7 +129,7 @@ namespace InstructionTests
     EXPECT_EQ(true, cpu->get_registers().get_flag(Status::Zero));
   }
 
-  TEST_F(InstructionTest, INCAbsoluteCanSetNegativeFlag)
+  TEST_F(IncDecTest, INCAbsoluteCanSetNegativeFlag)
   {
     cpu->load_rom({ 0xEE, 0x03, 0x00, 0x7F });
 
@@ -142,7 +144,7 @@ namespace InstructionTests
 #pragma endregion
 
 #pragma region INX Implied
-  TEST_F(InstructionTest, INXImplied)
+  TEST_F(IncDecTest, INXImplied)
   {
     cpu->load_rom({ 0xE8 });
     cpu->step();
@@ -154,7 +156,7 @@ namespace InstructionTests
     EXPECT_EQ(false, regs.get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, INXImpliedCanSetNegativeFlag)
+  TEST_F(IncDecTest, INXImpliedCanSetNegativeFlag)
   {
     cpu->load_rom({ 0xE8 });
 
@@ -171,7 +173,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, INXImpliedCanSetZeroFlag)
+  TEST_F(IncDecTest, INXImpliedCanSetZeroFlag)
   {
     cpu->load_rom({ 0xE8 });
 
@@ -190,7 +192,7 @@ namespace InstructionTests
 #pragma endregion
 
 #pragma region INY Implied
-  TEST_F(InstructionTest, INYImplied)
+  TEST_F(IncDecTest, INYImplied)
   {
     cpu->load_rom({ 0xC8 });
     cpu->step();
@@ -202,7 +204,7 @@ namespace InstructionTests
     EXPECT_EQ(false, regs.get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, INYImpliedCanSetNegativeFlag)
+  TEST_F(IncDecTest, INYImpliedCanSetNegativeFlag)
   {
     cpu->load_rom({ 0xC8 });
 
@@ -219,7 +221,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, INYImpliedCanSetZeroFlag)
+  TEST_F(IncDecTest, INYImpliedCanSetZeroFlag)
   {
     cpu->load_rom({ 0xC8 });
 
@@ -238,7 +240,7 @@ namespace InstructionTests
 #pragma endregion
 
 #pragma region DEX Implied
-  TEST_F(InstructionTest, DEXImplied)
+  TEST_F(IncDecTest, DEXImplied)
   {
     cpu->load_rom({ 0xCA });
     cpu->step();
@@ -250,7 +252,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, DEXImpliedCanSetZeroFlag)
+  TEST_F(IncDecTest, DEXImpliedCanSetZeroFlag)
   {
     cpu->load_rom({ 0xCA });
 
@@ -269,7 +271,7 @@ namespace InstructionTests
 #pragma endregion
 
 #pragma region DEY Implied
-  TEST_F(InstructionTest, DEYImplied)
+  TEST_F(IncDecTest, DEYImplied)
   {
     cpu->load_rom({ 0x88 });
     cpu->step();
@@ -281,7 +283,7 @@ namespace InstructionTests
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
-  TEST_F(InstructionTest, DEYImpliedCanSetZeroFlag)
+  TEST_F(IncDecTest, DEYImpliedCanSetZeroFlag)
   {
     cpu->load_rom({ 0x88 });
 

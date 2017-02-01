@@ -125,9 +125,12 @@
     <ClCompile Include="instructions\arithmetic.cpp" />
     <ClCompile Include="instructions\branch.cpp" />
     <ClCompile Include="instructions\clear_set.cpp" />
+    <ClCompile Include="instructions\compare.cpp" />
     <ClCompile Include="instructions\inc_dec.cpp" />
     <ClCompile Include="instructions\load_store.cpp" />
     <ClCompile Include="instructions\logical.cpp" />
+    <ClCompile Include="instructions\stack.cpp" />
+    <ClCompile Include="instructions\system.cpp" />
     <ClCompile Include="instructions\transfer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="opcode.cpp" />
