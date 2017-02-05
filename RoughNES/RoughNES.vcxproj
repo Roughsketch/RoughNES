@@ -120,11 +120,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cartridge.cpp" />
     <ClCompile Include="cpu.cpp" />
+    <ClCompile Include="nes_header.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cartridge.h" />
     <ClInclude Include="cpu.h" />
+    <ClInclude Include="nes_header.h" />
     <ClInclude Include="opcode.h" />
     <ClInclude Include="register.h" />
   </ItemGroup>
