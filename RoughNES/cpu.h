@@ -27,6 +27,7 @@ class CPU
 
   static void(CPU::*FuncTable[])(const OpcodeInfo&);
 
+  static inline bool pages_differ(uint16_t a, uint16_t b);
 public:
   static const uint16_t MemorySize = std::numeric_limits<uint16_t>::max();
 

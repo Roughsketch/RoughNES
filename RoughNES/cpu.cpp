@@ -35,6 +35,11 @@ void(CPU::*CPU::FuncTable[])(const OpcodeInfo&) = {
   &CPU::SED, &CPU::SBC, &CPU::NOP, &CPU::ISC, &CPU::NOP, &CPU::SBC, &CPU::INC, &CPU::ISC,
 };
 
+bool CPU::pages_differ(uint16_t a, uint16_t b)
+{
+  return (a & 0xFF00) != (b & 0xFF00);
+}
+
 CPU::CPU() : m_cycles(0)
 {
   m_sysmem.resize(MemorySize + 1);
@@ -65,7 +70,7 @@ void CPU::step()
   (this->*FuncTable[opcode])(opinfo);
 
   m_reg.pc += info.size;
-  m_cycles += info.cycles;
+  m_cycles += info.cycles + pages_differ(m_reg.pc ,address);
 };
 
 Registers CPU::get_registers() const
