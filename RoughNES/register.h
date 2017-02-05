@@ -35,6 +35,17 @@ struct Registers
     set_flag(Status::Unused, true);
   }
 
+  bool operator==(const Registers& other) const
+  {
+    return  a == other.a && 
+            x == other.x &&
+            y == other.y &&
+            s == other.s &&
+            p == other.p &&
+            pc == other.pc;
+  }
+
+
   void set_flag(Status status, bool value)
   {
     p = (p & ~status) | (static_cast<int>(value) * status);
