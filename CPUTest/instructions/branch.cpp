@@ -14,17 +14,12 @@ namespace InstructionTests
 
   TEST_F(BranchTest, BCCDoesNothingOnCarrySet)
   {
-    cpu->load_rom({ 0x90, 0x40 });
+    cpu->load_rom({ 0x38,           //  SEC
+                    0x90, 0x40 });  //  BCC $40
 
-    auto regs = cpu->get_registers();
-    regs.set_flag(Status::Carry, true);
-    cpu->set_registers(regs);
+    cpu->step(2);
 
-    cpu->step();
-
-    regs = cpu->get_registers();
-
-    EXPECT_EQ(2, regs.pc);
+    EXPECT_EQ(3, cpu->get_registers().pc);
   }
 
   TEST_F(BranchTest, BCCCanBranchNegative)
@@ -37,17 +32,12 @@ namespace InstructionTests
 
   TEST_F(BranchTest, BCSBranchesOnCarrySet)
   {
-    cpu->load_rom({ 0xB0, 0x40 });
+    cpu->load_rom({ 0x38,           //  SEC
+                    0xB0, 0x40 });  //  BCS $40
 
-    auto regs = cpu->get_registers();
-    regs.set_flag(Status::Carry, true);
-    cpu->set_registers(regs);
+    cpu->step(2);
 
-    cpu->step();
-
-    regs = cpu->get_registers();
-
-    EXPECT_EQ(0x42, regs.pc);
+    EXPECT_EQ(0x43, cpu->get_registers().pc);
   }
 
   TEST_F(BranchTest, BCSDoesNothingOnCarryClear)
@@ -60,17 +50,12 @@ namespace InstructionTests
 
   TEST_F(BranchTest, BCSCanBranchNegative)
   {
-    cpu->load_rom({ 0xB0, 0xFE });
+    cpu->load_rom({ 0x38,           //  SEC
+                    0xB0, 0xFD });  //  BCS $FE
 
-    auto regs = cpu->get_registers();
-    regs.set_flag(Status::Carry, true);
-    cpu->set_registers(regs);
+    cpu->step(2);
 
-    cpu->step();
-
-    regs = cpu->get_registers();
-
-    EXPECT_EQ(0, regs.pc);
+    EXPECT_EQ(0, cpu->get_registers().pc);
   }
 
   TEST_F(BranchTest, BEQBranchesOnZeroSet)
@@ -79,9 +64,7 @@ namespace InstructionTests
                     0xC9, 0x40,     //  CMP #$40
                     0xF0, 0x40 });  //  BEQ $40
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(0x46, cpu->get_registers().pc);
   }
@@ -100,9 +83,7 @@ namespace InstructionTests
                     0xC9, 0x40,     //  CMP #$40
                     0xF0, 0xFA });  //  BEQ $FA (-6)
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(0, cpu->get_registers().pc);
   }
@@ -113,9 +94,7 @@ namespace InstructionTests
                     0xC9, 0x41,     //  CMP #$41 ; Set negative flag
                     0x30, 0x40 });  //  BMI $40
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(0x46, cpu->get_registers().pc);
   }
@@ -134,9 +113,7 @@ namespace InstructionTests
                     0xC9, 0x41,     //  CMP #$41
                     0x30, 0xFA });  //  BEQ $FA (-6)
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(0, cpu->get_registers().pc);
   }
@@ -155,9 +132,7 @@ namespace InstructionTests
                     0xC9, 0x40,     //  CMP #$40
                     0xD0, 0x40 });  //  BNE $40
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(6, cpu->get_registers().pc);
   }
@@ -184,9 +159,7 @@ namespace InstructionTests
                     0xC9, 0x41,     //  CMP #$41
                     0x10, 0x40 });  //  BPL $40
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(6, cpu->get_registers().pc);
   }
@@ -213,9 +186,7 @@ namespace InstructionTests
                     0x69, 0x70,     //  ADC #$70  ; Set overflow
                     0x50, 0x40 });  //  BVC $40
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(6, cpu->get_registers().pc);
   }
@@ -234,9 +205,7 @@ namespace InstructionTests
                     0x69, 0x70,     //  ADC #$70  ; Set overflow
                     0x70, 0x40 });  //  BVS $40
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(0x46, cpu->get_registers().pc);
   }
@@ -255,9 +224,7 @@ namespace InstructionTests
                     0x69, 0x70,     //  ADC #$70  ; Set overflow
                     0x70, 0xFA });  //  BVS $FA (-6)
 
-    cpu->step();
-    cpu->step();
-    cpu->step();
+    cpu->step(3);
 
     EXPECT_EQ(0, cpu->get_registers().pc);
   }
