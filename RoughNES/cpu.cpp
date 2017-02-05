@@ -55,17 +55,20 @@ bool CPU::load_rom(const std::vector<uint8_t>& rom)
   return false;
 }
 
-void CPU::step()
+void CPU::step(size_t times)
 {
-  auto opcode = read_byte(m_reg.pc);
-  auto info = Instruction::Table[opcode];
-  auto address = get_address(info.mode);
-  OpcodeInfo opinfo = { address, m_reg.pc, info.mode, info.size };
+  while (times-- > 0)
+  {
+    auto opcode = read_byte(m_reg.pc);
+    auto info = Instruction::Table[opcode];
+    auto address = get_address(info.mode);
+    OpcodeInfo opinfo = { address, m_reg.pc, info.mode, info.size };
 
-  (this->*FuncTable[opcode])(opinfo);
+    (this->*FuncTable[opcode])(opinfo);
 
-  m_reg.pc += info.size;
-  m_cycles += info.cycles;
+    m_reg.pc += info.size;
+    m_cycles += info.cycles;
+  }
 };
 
 Registers CPU::get_registers() const
