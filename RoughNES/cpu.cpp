@@ -71,9 +71,10 @@ void CPU::step(size_t times)
 
     (this->*FuncTable[opcode])(opinfo);
 
-  m_reg.pc += info.size;
-  m_cycles += info.cycles + pages_differ(m_reg.pc ,address);
-};
+    m_reg.pc += info.size;
+    m_cycles += info.cycles + pages_differ(m_reg.pc, address);
+  }
+}
 
 Registers CPU::get_registers() const
 {
