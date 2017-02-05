@@ -35,7 +35,7 @@ public:
   explicit CPU(const std::vector<uint8_t>& rom);
 
   bool load_rom(const std::vector<uint8_t>& rom);
-  void step();
+  void step(size_t times = 1);
 
   void set_registers(Registers regs);
   void write_byte(uint8_t value, uint16_t pos);
