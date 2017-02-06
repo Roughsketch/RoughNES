@@ -50,6 +50,11 @@ CPU::CPU(const std::vector<uint8_t>& rom) : CPU()
   load_rom(rom);
 }
 
+CPU::CPU(Cartridge& cart) : CPU()
+{
+  load_rom(cart.prg_rom());
+}
+
 bool CPU::load_rom(const std::vector<uint8_t>& rom)
 {
   if (rom.size() <= MemorySize)
@@ -60,8 +65,10 @@ bool CPU::load_rom(const std::vector<uint8_t>& rom)
   return false;
 }
 
-void CPU::step(size_t times)
+int CPU::step(size_t times)
 {
+  auto start_cycles = m_cycles;
+
   while (times-- > 0)
   {
     auto opcode = read_byte(m_reg.pc);
@@ -74,6 +81,8 @@ void CPU::step(size_t times)
     m_reg.pc += info.size;
     m_cycles += info.cycles + pages_differ(m_reg.pc, address);
   }
+
+  return m_cycles - start_cycles;
 }
 
 Registers CPU::get_registers() const
