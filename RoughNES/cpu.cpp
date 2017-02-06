@@ -52,7 +52,7 @@ CPU::CPU(const std::vector<uint8_t>& rom) : CPU()
 
 bool CPU::load_rom(const std::vector<uint8_t>& rom)
 {
-  if (rom.size() < MemorySize)
+  if (rom.size() <= MemorySize)
   {
     std::copy(std::begin(rom), std::end(rom), std::begin(m_sysmem));
     return true;
@@ -158,11 +158,11 @@ uint16_t CPU::read_word(uint16_t pos) const
   return read_byte(pos) | (read_byte(pos + 1) << 8);
 }
 
-std::vector<uint8_t> CPU::read_bytes(uint16_t start, uint16_t size) const
+std::vector<uint8_t> CPU::read_bytes(uint16_t start, size_t size) const
 {
   std::vector<uint8_t> data;
 
-  if (start + size < MemorySize)
+  if (start + size <= MemorySize)
   {
     data.resize(size);
     std::copy(std::begin(m_sysmem) + start, std::begin(m_sysmem) + start + size, std::begin(data));

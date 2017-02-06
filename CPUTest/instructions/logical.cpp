@@ -36,7 +36,7 @@ namespace InstructionTests
 
     auto regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xF0), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xF0u), regs.a);
   }
 
   TEST_F(LogicalTest, ORADoesBitwiseOr)
@@ -47,7 +47,7 @@ namespace InstructionTests
 
     auto regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xF5), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xF5u), regs.a);
   }
 
   TEST_F(LogicalTest, BITCanSetNegative)

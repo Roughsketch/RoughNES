@@ -178,7 +178,7 @@ namespace InstructionTests
     cpu->load_rom({ 0xE8 });
 
     auto regs = cpu->get_registers();
-    regs.x = 0xFF;
+    regs.x = 0xFFu;
     cpu->set_registers(regs);
 
     cpu->step();
@@ -226,7 +226,7 @@ namespace InstructionTests
     cpu->load_rom({ 0xC8 });
 
     auto regs = cpu->get_registers();
-    regs.y = 0xFF;
+    regs.y = 0xFFu;
     cpu->set_registers(regs);
 
     cpu->step();

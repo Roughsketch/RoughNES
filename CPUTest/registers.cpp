@@ -105,7 +105,7 @@ namespace RegisterTests
   TEST_F(RegisterTest, CanSetNegativeAndOverflowBits)
   {
     //  Only negative
-    regs.set_nv(0x80);
+    regs.set_nv(0x80u);
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
     EXPECT_EQ(false, regs.get_flag(Status::Overflow));
 
@@ -115,7 +115,7 @@ namespace RegisterTests
     EXPECT_EQ(true, regs.get_flag(Status::Overflow));
 
     //  Both negative and overflow
-    regs.set_nv(0xC0);
+    regs.set_nv(0xC0u);
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
     EXPECT_EQ(true, regs.get_flag(Status::Overflow));
 
@@ -128,7 +128,7 @@ namespace RegisterTests
   TEST_F(RegisterTest, CanSetZeroAndNegativeBits)
   {
     //  Only negative
-    regs.set_zn(0x80);
+    regs.set_zn(0x80u);
     EXPECT_EQ(false, regs.get_flag(Status::Zero));
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
 
@@ -145,7 +145,7 @@ namespace RegisterTests
 
   TEST_F(RegisterTest, OverflowSetWithTwoLargeValues)
   {
-    regs.set_overflow(0x80 + 0x80, 0x80, 0x80);
+    regs.set_overflow(0, 0x80u, 0x80u);
     EXPECT_EQ(true, regs.get_flag(Status::Overflow));
   }
 
@@ -157,13 +157,13 @@ namespace RegisterTests
 
   TEST_F(RegisterTest, OppositeSignsDoNotSetOverflow)
   {
-    regs.set_overflow(0x80 + 0x7F, 0x80, 0x7F);
+    regs.set_overflow(0xFFu, 0x80u, 0x7Fu);
     EXPECT_EQ(false, regs.get_flag(Status::Overflow));
   }
 
   TEST_F(RegisterTest, OverflowSetWithSmallAndLargeValues)
   {
-    regs.set_overflow(0x01 + 0x7F, 0x01, 0x7F);
+    regs.set_overflow(0x01 + 0x7Fu, 0x01, 0x7Fu);
     EXPECT_EQ(true, regs.get_flag(Status::Overflow));
   }
 };

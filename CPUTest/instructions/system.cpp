@@ -6,10 +6,18 @@ namespace InstructionTests
 
   TEST_F(SystemTest, BRKStoresState)
   {
-    cpu->load_rom({ 0x00 });
+    std::vector<uint8_t> brk_rom(CPU::MemorySize);
+    brk_rom[0xFFFF] = 0x40;
+
+    cpu->load_rom(brk_rom);
     cpu->step();
 
-    FAIL() << "Not implemented";
+    auto regs = cpu->get_registers();
+
+    EXPECT_EQ(true, regs.get_flag(Status::Break));
+    EXPECT_EQ(0x4000, regs.pc);
+    EXPECT_EQ(0b00100000, cpu->stack_pull_byte());
+    EXPECT_EQ(0, cpu->stack_pull_word());
   }
 
   TEST_F(SystemTest, NOPDoesNothing)

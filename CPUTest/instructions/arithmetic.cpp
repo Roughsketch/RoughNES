@@ -91,7 +91,7 @@ namespace InstructionTests
 
     auto regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xF0), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xF0u), regs.a);
     EXPECT_EQ(false, regs.get_flag(Status::Zero));
     EXPECT_EQ(false, regs.get_flag(Status::Carry));
     EXPECT_EQ(true, regs.get_flag(Status::Overflow));
@@ -115,7 +115,7 @@ namespace InstructionTests
     cpu->load_rom({ 0x4A });
 
     auto regs = cpu->get_registers();
-    regs.a = 0xA4;
+    regs.a = 0xA4u;
     regs.set_flag(Status::Carry, true);
     cpu->set_registers(regs);
 
@@ -123,7 +123,7 @@ namespace InstructionTests
 
     regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xD2), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xD2u), regs.a);
     EXPECT_EQ(false, regs.get_flag(Status::Carry));
   }
 
@@ -142,7 +142,7 @@ namespace InstructionTests
     cpu->load_rom({ 0x4A });
 
     auto regs = cpu->get_registers();
-    regs.a = 0xA4;
+    regs.a = 0xA4u;
     regs.set_flag(Status::Carry, true);
     cpu->set_registers(regs);
 
@@ -150,7 +150,7 @@ namespace InstructionTests
 
     regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xD2), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xD2u), regs.a);
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
@@ -254,7 +254,7 @@ namespace InstructionTests
 
     auto regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0x80), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0x80u), regs.a);
     EXPECT_EQ(true, regs.get_flag(Status::Negative));
   }
 
@@ -322,7 +322,7 @@ namespace InstructionTests
     cpu->load_rom({ 0x6A });
 
     auto regs = cpu->get_registers();
-    regs.a = 0xAA;
+    regs.a = 0xAAu;
     regs.set_flag(Status::Carry, true);
     cpu->set_registers(regs);
 
@@ -330,7 +330,7 @@ namespace InstructionTests
 
     regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xD5), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xD5u), regs.a);
   }
 
   TEST_F(ArithmeticTest, RORCanRotateRight)
@@ -362,7 +362,7 @@ namespace InstructionTests
 
     auto regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xAA), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xAAu), regs.a);
   }
 
   TEST_F(ArithmeticTest, ROLCanRotateAccumulatorLeftWithCarry)
@@ -378,7 +378,7 @@ namespace InstructionTests
 
     regs = cpu->get_registers();
 
-    EXPECT_EQ(static_cast<int8_t>(0xAB), regs.a);
+    EXPECT_EQ(static_cast<int8_t>(0xABu), regs.a);
   }
 
   TEST_F(ArithmeticTest, ROLCanRotateLeft)

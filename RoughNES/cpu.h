@@ -29,7 +29,7 @@ class CPU
 
   static inline bool pages_differ(uint16_t a, uint16_t b);
 public:
-  static const uint16_t MemorySize = std::numeric_limits<uint16_t>::max();
+  static const size_t MemorySize = 0x10000;
 
   CPU();
   explicit CPU(const std::vector<uint8_t>& rom);
@@ -46,7 +46,7 @@ public:
   uint16_t get_address(Instruction::AddressMode mode) const;
   uint8_t read_byte(uint16_t pos) const;
   uint16_t read_word(uint16_t pos) const;
-  std::vector<uint8_t> read_bytes(uint16_t start, uint16_t size) const;
+  std::vector<uint8_t> read_bytes(uint16_t start, size_t size) const;
 
   inline void set_reg_a(uint8_t value);
   inline void set_reg_x(uint8_t value);
@@ -422,7 +422,7 @@ void CPU::BRK(const OpcodeInfo& info)
   stack_push_word(m_reg.pc);
   stack_push_byte(m_reg.p);
 
-  m_reg.pc = read_word(IRQVectorAddress);
+  m_reg.pc = read_word(IRQVectorAddress) - info.size;
   m_reg.set_flag(Status::Break, true);
 }
 
