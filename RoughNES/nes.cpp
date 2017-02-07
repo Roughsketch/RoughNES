@@ -3,13 +3,23 @@
 NES::NES()
 {
   m_cart = nullptr;
-  m_cpu = std::make_unique<CPU>();
-  m_ppu = std::make_unique<PPU>();
+  m_cpu = std::make_shared<CPU>(self());
+  m_ppu = std::make_shared<PPU>(self());
 }
 
 NES::NES(std::string filename) : NES()
 {
-  m_cart = std::make_unique<Cartridge>(filename);
+  m_cart = std::make_shared<Cartridge>(filename);
+}
+
+std::shared_ptr<CPU> NES::cpu() const
+{
+  return m_cpu;
+}
+
+std::shared_ptr<PPU> NES::ppu() const
+{
+  return m_ppu;
 }
 
 int NES::step() const

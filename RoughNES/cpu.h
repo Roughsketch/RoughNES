@@ -7,16 +7,26 @@
 #include "register.h"
 #include "opcode.h"
 #include "cartridge.h"
+#include "nes.h"
 
 class CPU
 {
   const uint16_t IRQVectorAddress = 0xFFFE;
   const uint16_t StackStart = 0x100;
 
+  std::shared_ptr<NES> m_console;
+
   std::vector<uint8_t> m_rom;
   std::vector<uint8_t> m_sysmem;
   Registers m_reg;
   uint64_t m_cycles;
+
+  enum Interrupt : uint8_t
+  {
+    None,
+    NMI,
+    IRQ
+  };
 
   struct OpcodeInfo
   {
@@ -35,6 +45,7 @@ public:
   CPU();
   explicit CPU(const std::vector<uint8_t>& rom);
   explicit CPU(Cartridge& cart);
+  explicit CPU(std::shared_ptr<NES> console);
 
   bool load_rom(const std::vector<uint8_t>& rom);
   int step(size_t times = 1);

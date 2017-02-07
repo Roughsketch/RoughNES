@@ -2,8 +2,12 @@
 
 #include <vector>
 
+#include "nes.h"
+
 class PPU
 {
+  std::shared_ptr<NES> m_console;
+
   std::vector<uint8_t> m_palette;
   std::vector<uint8_t> m_nametable;
   std::vector<uint8_t> m_oam_data;
@@ -18,6 +22,8 @@ class PPU
   } m_regs;
 public:
   PPU();
+  explicit PPU(std::shared_ptr<NES> console);
+
   void step();
 };
 

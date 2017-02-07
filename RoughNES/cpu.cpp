@@ -55,6 +55,11 @@ CPU::CPU(Cartridge& cart) : CPU()
   load_rom(cart.prg_rom());
 }
 
+CPU::CPU(std::shared_ptr<NES> console) : CPU()
+{
+  m_console = console;
+}
+
 bool CPU::load_rom(const std::vector<uint8_t>& rom)
 {
   if (rom.size() <= MemorySize)
