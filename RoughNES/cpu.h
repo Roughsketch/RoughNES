@@ -11,15 +11,9 @@
 
 class CPU
 {
+  const uint16_t NMIVectorAddress = 0xFFFA;
   const uint16_t IRQVectorAddress = 0xFFFE;
   const uint16_t StackStart = 0x100;
-
-  std::shared_ptr<NES> m_console;
-
-  std::vector<uint8_t> m_rom;
-  std::vector<uint8_t> m_sysmem;
-  Registers m_reg;
-  uint64_t m_cycles;
 
   enum Interrupt : uint8_t
   {
@@ -27,6 +21,14 @@ class CPU
     NMI,
     IRQ
   };
+
+  std::shared_ptr<NES> m_console;
+
+  std::vector<uint8_t> m_rom;
+  std::vector<uint8_t> m_sysmem;
+  Registers m_reg;
+  uint64_t m_cycles;
+  Interrupt m_interrupt;
 
   struct OpcodeInfo
   {
@@ -70,6 +72,10 @@ public:
   inline uint8_t stack_pull_byte();
   inline void stack_push_word(uint16_t value);
   inline uint16_t stack_pull_word();
+
+  inline void trigger_nmi();
+  inline void trigger_irq();
+  inline void interrupt(Interrupt inter);
 
 #pragma region Set and Clear status flags
   inline void SEC(const OpcodeInfo& info);
@@ -226,6 +232,27 @@ uint16_t CPU::stack_pull_word()
 {
   ++m_reg.s;
   return read_word(StackStart | m_reg.s);
+}
+
+void CPU::interrupt(Interrupt inter)
+{
+  stack_push_word(m_reg.pc);
+  PHP(OpcodeInfo{});
+
+  switch (inter)
+  { 
+    case Interrupt::NMI:
+      m_reg.pc = read_word(NMIVectorAddress);
+      break;
+    case Interrupt::IRQ:
+      m_reg.pc = read_word(IRQVectorAddress);
+      break;
+    default:
+      break;
+  }
+
+  m_reg.set_flag(Status::Interrupt, true);
+  m_cycles += 7;
 }
 
 void CPU::SEC(const OpcodeInfo& info)

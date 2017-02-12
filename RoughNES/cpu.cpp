@@ -81,6 +81,13 @@ int CPU::step(size_t times)
     auto address = get_address(info.mode);
     OpcodeInfo opinfo = { address, m_reg.pc, info.mode, info.size };
 
+    if (m_interrupt != Interrupt::None)
+    {
+      interrupt(m_interrupt);
+    }
+
+    m_interrupt = Interrupt::None;
+
     (this->*FuncTable[opcode])(opinfo);
 
     m_reg.pc += info.size;
@@ -183,4 +190,14 @@ std::vector<uint8_t> CPU::read_bytes(uint16_t start, size_t size) const
   }
 
   return data;
+}
+
+void CPU::trigger_nmi()
+{
+  m_interrupt = Interrupt::NMI;
+}
+
+void CPU::trigger_irq()
+{
+  m_interrupt = Interrupt::IRQ;
 }
