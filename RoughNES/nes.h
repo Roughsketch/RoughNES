@@ -6,9 +6,11 @@
 
 #include <memory>
 
+class CPU;
+class PPU;
+
 class NES : std::enable_shared_from_this<NES>
 {
-  std::shared_ptr<NES> m_self;
   std::shared_ptr<Cartridge> m_cart;
   std::shared_ptr<CPU> m_cpu;
   std::shared_ptr<PPU> m_ppu;
@@ -24,5 +26,5 @@ public:
   inline std::shared_ptr<CPU> cpu() const;
   inline std::shared_ptr<PPU> ppu() const;
 
-  int step() const;
+  uint64_t step() const;
 };

@@ -17,6 +17,8 @@ class NESHeader
 
   uint8_t m_submapper;
 public:
+  static const size_t Size = 0x10;
+
   NESHeader(){};
   explicit NESHeader(std::vector<uint8_t>& header);
 

@@ -1,19 +1,28 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <vector>
-#include <stack>
 
 #include "register.h"
 #include "opcode.h"
 #include "cartridge.h"
 #include "nes.h"
 
+class NES;
+
 class CPU
 {
   const uint16_t NMIVectorAddress = 0xFFFA;
   const uint16_t IRQVectorAddress = 0xFFFE;
   const uint16_t StackStart = 0x100;
+
+  std::shared_ptr<NES> m_console;
+
+  std::vector<uint8_t> m_rom;
+  std::vector<uint8_t> m_sysmem;
+  Registers m_reg;
+  uint64_t m_cycles;
 
   enum Interrupt : uint8_t
   {
@@ -50,7 +59,8 @@ public:
   explicit CPU(std::shared_ptr<NES> console);
 
   bool load_rom(const std::vector<uint8_t>& rom);
-  int step(size_t times = 1);
+  uint64_t step(size_t times = 1);
+  void stall(uint64_t cycles);
 
   void set_registers(Registers regs);
   void write_byte(uint8_t value, uint16_t pos);

@@ -32,7 +32,12 @@ Cartridge::Cartridge(std::string filename)
   m_prgrom.resize(prg_size);
   m_chrrom.resize(chr_size);
 
-  std::copy(std::begin(rom) + 0x10, std::begin(rom) + 0x10 + prg_size, std::begin(m_prgrom));
-  std::copy(std::begin(rom) + 0x10 + prg_size, std::begin(rom) + 0x10 + prg_size + chr_size, std::begin(m_chrrom));
+  std::copy(std::begin(rom) + NESHeader::Size,
+    std::begin(rom) + NESHeader::Size + prg_size,
+    std::begin(m_prgrom));
+
+  std::copy(std::begin(rom) + NESHeader::Size + prg_size,
+    std::begin(rom) + NESHeader::Size + prg_size + chr_size,
+    std::begin(m_chrrom));
 }
 
