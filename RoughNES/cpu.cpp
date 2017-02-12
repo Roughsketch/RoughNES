@@ -97,6 +97,11 @@ uint64_t CPU::step(size_t times)
   return m_cycles - start_cycles;
 }
 
+void CPU::stall(uint64_t cycles)
+{
+  m_stall += cycles;
+}
+
 Registers CPU::get_registers() const
 {
   return m_reg;

@@ -17,13 +17,6 @@ class CPU
   const uint16_t IRQVectorAddress = 0xFFFE;
   const uint16_t StackStart = 0x100;
 
-  std::shared_ptr<NES> m_console;
-
-  std::vector<uint8_t> m_rom;
-  std::vector<uint8_t> m_sysmem;
-  Registers m_reg;
-  uint64_t m_cycles;
-
   enum Interrupt : uint8_t
   {
     None,
@@ -38,6 +31,7 @@ class CPU
   Registers m_reg;
   uint64_t m_cycles;
   Interrupt m_interrupt;
+  uint64_t m_stall;
 
   struct OpcodeInfo
   {
