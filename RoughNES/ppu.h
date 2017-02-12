@@ -1,8 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "nes.h"
+
+class NES;
 
 class PPU
 {

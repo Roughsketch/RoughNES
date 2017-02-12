@@ -40,7 +40,7 @@ bool CPU::pages_differ(uint16_t a, uint16_t b)
   return (a & 0xFF00) != (b & 0xFF00);
 }
 
-CPU::CPU() : m_cycles(0)
+CPU::CPU() : m_cycles(0), m_stall(0)
 {
   m_sysmem.resize(MemorySize + 1);
 };
@@ -70,7 +70,7 @@ bool CPU::load_rom(const std::vector<uint8_t>& rom)
   return false;
 }
 
-int CPU::step(size_t times)
+uint64_t CPU::step(size_t times)
 {
   auto start_cycles = m_cycles;
 

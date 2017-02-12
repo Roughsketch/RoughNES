@@ -10,6 +10,7 @@ NES::NES()
 NES::NES(std::string filename) : NES()
 {
   m_cart = std::make_shared<Cartridge>(filename);
+  m_cpu->load_rom(m_cart->prg_rom());
 }
 
 std::shared_ptr<CPU> NES::cpu() const
@@ -22,7 +23,7 @@ std::shared_ptr<PPU> NES::ppu() const
   return m_ppu;
 }
 
-int NES::step() const
+uint64_t NES::step() const
 {
   auto cpu_cycles = m_cpu->step();
   auto ppu_cycles = cpu_cycles * 3;

@@ -1,13 +1,15 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <vector>
-#include <stack>
 
 #include "register.h"
 #include "opcode.h"
 #include "cartridge.h"
 #include "nes.h"
+
+class NES;
 
 class CPU
 {
@@ -20,6 +22,7 @@ class CPU
   std::vector<uint8_t> m_sysmem;
   Registers m_reg;
   uint64_t m_cycles;
+  uint64_t m_stall;
 
   enum Interrupt : uint8_t
   {
@@ -48,7 +51,8 @@ public:
   explicit CPU(std::shared_ptr<NES> console);
 
   bool load_rom(const std::vector<uint8_t>& rom);
-  int step(size_t times = 1);
+  uint64_t step(size_t times = 1);
+  void stall(uint64_t cycles);
 
   void set_registers(Registers regs);
   void write_byte(uint8_t value, uint16_t pos);
